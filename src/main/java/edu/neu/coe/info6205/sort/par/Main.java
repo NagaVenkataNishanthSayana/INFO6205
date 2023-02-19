@@ -39,8 +39,8 @@ public class Main {
             System.out.println("Length of array is " + arrLengths[l]);
             System.out.println();
 
-
                 for (int n = 0; n < threadNum.length; n++) {
+
                     for (int c = 0; c < cutoffLen.length; c++) {
                         ParSort.cutoff = cutoffLen[c];
 
@@ -56,9 +56,10 @@ public class Main {
                         timeList.add(time);
 
 
-                        System.out.println("cutoff：" + (ParSort.cutoff) + " Thread Count: " + threadNum[n] + "\t\t10times Time:" + time + "ms");}
+                        System.out.println("cutoff：" + (ParSort.cutoff) + " Thread Count: " + threadNum[n] + "\t\t10times Time:" + time + "ms");
+                    }
+                }
             }
-        }
         try {
             FileOutputStream fis = new FileOutputStream("./src/result.csv");
             OutputStreamWriter isr = new OutputStreamWriter(fis);
