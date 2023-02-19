@@ -21,59 +21,42 @@ public class Main {
         System.out.println("Degree of parallelism: " + ForkJoinPool.getCommonPoolParallelism());
 
         int[] arrLengths = {524288,1048576,2097152,4194304};
-        ForkJoinPool forkPool;
 
         int[] threadNum = {2, 4, 8, 16,32};
+
+        ForkJoinPool forkPool;
+
         Random random = new Random();
         int[] array;
         ArrayList<Long> timeList = new ArrayList<>();
-
-        for(int l=0;l<arrLengths.length;l++) {
-            int length=arrLengths[l];
+        for (int i = 0; i < arrLengths.length; i++) {
+            int length = arrLengths[i];
             array = new int[length];
+            System.out.println("Array size is " + length);
 
+            //cut-off lengths according to levels of recursion tree
             int[] cutoffLen = {length / 1024 + 1, length / 512 + 1, length / 256 + 1, length / 128 + 1,
                     length / 64 + 1, length / 32 + 1, length / 16 + 1, length / 8 + 1, length / 4 + 1,
                     length / 2 + 1, length + 1};
 
-            System.out.println("Length of array is " + arrLengths[l]);
-            System.out.println();
-
-
+            for (int c = 0; c < cutoffLen.length; c++) {
+                ParSort.cutoff = cutoffLen[c];
                 for (int n = 0; n < threadNum.length; n++) {
-                    for (int c = 0; c < cutoffLen.length; c++) {
-                        ParSort.cutoff = cutoffLen[c];
+                    forkPool = new ForkJoinPool(threadNum[n]);
+                    long duration;
+                    long startTimems = System.currentTimeMillis();
+                    for (int t = 0; t < 10; t++) {
+                        for (int j = 0; j < length; j++) array[j] = random.nextInt(10000000);
+                        ParSort.sort(array, 0, array.length, forkPool);
+                    }
+                    long endTimems = System.currentTimeMillis();
+                    duration = (endTimems - startTimems);
 
-                        forkPool = new ForkJoinPool(threadNum[n]);
-                        long time;
-                        long startTime = System.currentTimeMillis();
-                        for (int t = 0; t < 10; t++) {
-                            for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-                            ParSort.sort(array, 0, array.length, forkPool);
-                        }
-                        long endTime = System.currentTimeMillis();
-                        time = (endTime - startTime);
-                        timeList.add(time);
-
-
-                        System.out.println("cutoff：" + (ParSort.cutoff) + " Thread Count: " + threadNum[n] + "\t\t10times Time:" + time + "ms");}
+                    System.out.println(" cut-off is：" + (ParSort.cutoff) +
+                            " number of threads：" + (threadNum[n]) + "\t\taverage time taken:" + (duration / 10) + "ms");
+                    timeList.add(duration);
+                }
             }
-        }
-        try {
-            FileOutputStream fis = new FileOutputStream("./src/result.csv");
-            OutputStreamWriter isr = new OutputStreamWriter(fis);
-            BufferedWriter bw = new BufferedWriter(isr);
-            int j = 0;
-            for (long i : timeList) {
-                String content = (double) 10000 * (j + 1) / 2000000 + "," + (double) i / 10 + "\n";
-                j++;
-                bw.write(content);
-                bw.flush();
-            }
-            bw.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
