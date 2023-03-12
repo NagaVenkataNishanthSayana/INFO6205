@@ -39,27 +39,27 @@ public class Main {
             System.out.println("Length of array is " + arrLengths[l]);
             System.out.println();
 
+            for (int c = 0; c < cutoffLen.length; c++) {
+                ParSort.cutoff = cutoffLen[c];
                 for (int n = 0; n < threadNum.length; n++) {
 
-                    for (int c = 0; c < cutoffLen.length; c++) {
-                        ParSort.cutoff = cutoffLen[c];
 
-                        forkPool = new ForkJoinPool(threadNum[n]);
-                        long time;
-                        long startTime = System.currentTimeMillis();
-                        for (int t = 0; t < 10; t++) {
-                            for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-                            ParSort.sort(array, 0, array.length, forkPool);
-                        }
-                        long endTime = System.currentTimeMillis();
-                        time = (endTime - startTime);
-                        timeList.add(time);
-
-
-                        System.out.println("cutoff：" + (ParSort.cutoff) + " Thread Count: " + threadNum[n] + "\t\t10times Time:" + time + "ms");
+                    forkPool = new ForkJoinPool(threadNum[n]);
+                    long time;
+                    long startTime = System.currentTimeMillis();
+                    for (int t = 0; t < 10; t++) {
+                        for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
+                        ParSort.sort(array, 0, array.length, forkPool);
                     }
-                }
+                    long endTime = System.currentTimeMillis();
+                    time = (endTime - startTime);
+                    timeList.add(time);
+
+
+                    System.out.println("array size is: " + length + " cut-off is：" + (ParSort.cutoff) +
+                            " number of threads：" + (threadNum[n]) + "\t\taverage time taken:" + (time / 10) + "ms");                }
             }
+        }
         try {
             FileOutputStream fis = new FileOutputStream("./src/result.csv");
             OutputStreamWriter isr = new OutputStreamWriter(fis);
